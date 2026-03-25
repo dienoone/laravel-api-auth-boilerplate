@@ -9,8 +9,11 @@ Route::prefix('auth')
 
         // public routes
         Route::post('/register',                'register');
-        Route::post('/login',                   'login');
+        Route::post('/login',                   'login')->middleware('throttle:auth-sensitive');
         Route::get('/email/verify/{id}/{hash}', 'verifyEmail')->name('verification.verify');
+        Route::post('/password/forgot',         'forgotPassword')->middleware('throttle:auth-sensitive');
+        Route::post('/password/reset',          'resetPassword')->middleware('throttle:auth-sensitive');
+
 
         // Protected routes
         Route::middleware('auth:sanctum')

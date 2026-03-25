@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Contracts\Repositories\AuthRepositoryInterface;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthRepository implements AuthRepositoryInterface
 {
@@ -32,5 +33,12 @@ class AuthRepository implements AuthRepositoryInterface
     public function markEmailAsVerified(User $user): bool
     {
         return $user->markEmailAsVerified();
+    }
+
+    public function updatePassword(User $user, string $password): bool
+    {
+        return $user->update([
+            'password' => Hash::make($password),
+        ]);
     }
 }

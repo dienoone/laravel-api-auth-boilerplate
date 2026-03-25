@@ -24,3 +24,18 @@ curl "http://localhost:8000/api/v1/auth/email/verify/1/HASH_FROM_EMAIL"
 # resend verification
 curl -X POST http://localhost:8000/api/v1/auth/email/resend \
     -H "Authorization: Bearer YOUR_TOKEN"
+
+# forgot password
+curl -X POST http://localhost:8000/api/v1/auth/password/forgot \
+    -H "Content-Type: application/json" \
+    -d '{"email":"john@example.com"}'
+
+# reset password
+curl -X POST http://localhost:8000/api/v1/auth/password/reset \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "TOKEN_FROM_EMAIL",
+    "email": "john@example.com",
+    "password": "newpassword123",
+    "password_confirmation": "newpassword123"
+  }'

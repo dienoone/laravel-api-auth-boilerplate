@@ -11,4 +11,5 @@ interface AuthRepositoryInterface
     public function create(array $data): ?User;
     public function update(User $user, array $data): ?User;
     public function markEmailAsVerified(User $user): bool;
+    public function updatePassword(User $user, string $password): bool;
 }

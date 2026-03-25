@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
 
 class AuthService implements AuthServiceInterface
 {
@@ -91,5 +93,38 @@ class AuthService implements AuthServiceInterface
         );
 
         $user->sendEmailVerificationNotification();
+    }
+
+    public function forgotPassword(string $email): void
+    {
+        $status = Password::sendResetLink(['email' => $email]);
+
+        throw_if(
+            $status !== Password::RESET_LINK_SENT,
+            ValidationException::class,
+            ['email' => 'Unable to send reset link. Please try again.',]
+        );
+    }
+
+    public function resetPassword(array $data): void  // new
+    {
+        $status = Password::reset(
+            $data,
+            function (User $user, string $password) {
+                $this->authRepository->updatePassword($user, $password);
+
+                $user->tokens()->delete();
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            throw ValidationException::withMessages([
+                'token' => match ($status) {
+                    Password::INVALID_TOKEN => 'This reset token is invalid or has expired.',
+                    Password::INVALID_USER  => 'We could not find a user with that email.',
+                    default                 => 'Unable to reset password. Please try again.',
+                },
+            ]);
+        }
     }
 }

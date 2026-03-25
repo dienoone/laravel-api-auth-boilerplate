@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Contracts\Services\AuthServiceInterface;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -66,5 +68,22 @@ class AuthController extends Controller
         $this->authService->resendVerification($request->user());
 
         return $this->success(null, 'Verification email sent. Please check your inbox.');
+    }
+
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    {
+        $this->authService->forgotPassword($request->validated('email'));
+
+        return $this->success(
+            null,
+            'If this email is registered, you will receive a password reset link shortly.'
+        );
+    }
+
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    {
+        $this->authService->resetPassword($request->validated());
+
+        return $this->success(null, 'Password reset successfully. Please log in with your new password.');
     }
 }
