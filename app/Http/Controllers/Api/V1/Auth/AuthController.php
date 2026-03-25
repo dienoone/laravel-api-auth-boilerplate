@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Contracts\Services\AuthServiceInterface;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\UserResource;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
+class AuthController extends Controller
+{
+    public function __construct(
+        protected AuthServiceInterface $authService
+    ) {}
+
+    public function register(RegisterRequest $request): JsonResponse
+    {
+        $user = $this->authService->register($request->validated());
+
+        return $this->created(
+            new UserResource($user),
+            'Account created successfully.'
+        );
+    }
+
+    public function login(LoginRequest $request): JsonResponse
+    {
+        $result = $this->authService->login($request->validated());
+
+        return $this->success([
+            'user'  => new UserResource($result['user']),
+            'token' => $result['token'],
+        ], 'Logged in successfully.');
+    }
+
+    public function logout(Request $request): JsonResponse
+    {
+        $this->authService->logout($request->user());
+
+        return $this->noContent('Logged out successfully.');
+    }
+
+    public function me(Request $request): JsonResponse
+    {
+        $user = $this->authService->me($request->user());
+
+        return $this->success(new UserResource($user));
+    }
+}
