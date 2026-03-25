@@ -28,4 +28,9 @@ class AuthRepository implements AuthRepositoryInterface
         $user->update($data);
         return $user->fresh();
     }
+
+    public function markEmailAsVerified(User $user): bool
+    {
+        return $user->markEmailAsVerified();
+    }
 }

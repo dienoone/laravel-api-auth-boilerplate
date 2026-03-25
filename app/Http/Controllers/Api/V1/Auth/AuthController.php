@@ -49,4 +49,22 @@ class AuthController extends Controller
 
         return $this->success(new UserResource($user));
     }
+
+    public function verifyEmail(Request $request, int $id, string $hash): JsonResponse
+    {
+        $wasVerifiedNow = $this->authService->verifyEmail($id, $hash);
+
+        $message = $wasVerifiedNow
+            ? 'Email verified successfully.'
+            : 'Email was already verified.';
+
+        return $this->success(null, $message);
+    }
+
+    public function resendVerification(Request $request): JsonResponse
+    {
+        $this->authService->resendVerification($request->user());
+
+        return $this->success(null, 'Verification email sent. Please check your inbox.');
+    }
 }

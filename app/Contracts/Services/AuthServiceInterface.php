@@ -10,4 +10,6 @@ interface AuthServiceInterface
     public function login(array $data): array;
     public function logout(User $user): void;
     public function me(User $user): User;
+    public function verifyEmail(int $id, string $hash): bool;
+    public function resendVerification(User $user): void;
 }

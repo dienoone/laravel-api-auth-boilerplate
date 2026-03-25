@@ -17,3 +17,10 @@ curl http://localhost:8000/api/v1/auth/me \
 # logout
 curl -X POST http://localhost:8000/api/v1/auth/logout \
     -H "Authorization: Bearer 1|abc123..."
+
+# verify
+curl "http://localhost:8000/api/v1/auth/email/verify/1/HASH_FROM_EMAIL"
+
+# resend verification
+curl -X POST http://localhost:8000/api/v1/auth/email/resend \
+    -H "Authorization: Bearer YOUR_TOKEN"
