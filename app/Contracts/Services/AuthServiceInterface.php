@@ -14,4 +14,6 @@ interface AuthServiceInterface
     public function resendVerification(User $user): void;
     public function forgotPassword(string $email): void;
     public function resetPassword(array $data): void;
+    public function changePassword(User $user, array $data): void;
+    public function handleSocialToken(string $provider, string $accessToken): array;
 }

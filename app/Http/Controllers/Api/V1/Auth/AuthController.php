@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
-use App\Http\Controllers\Controller;
 use App\Contracts\Services\AuthServiceInterface;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ChangePasswordRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
-use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Http\Requests\Auth\SocialTokenRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -85,5 +87,25 @@ class AuthController extends Controller
         $this->authService->resetPassword($request->validated());
 
         return $this->success(null, 'Password reset successfully. Please log in with your new password.');
+    }
+
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
+    {
+        $this->authService->changePassword($request->user(), $request->validated());
+
+        return $this->success(null, 'Password changed successfully.');
+    }
+
+    public function socialToken(SocialTokenRequest $request, string $provider): JsonResponse
+    {
+        $result = $this->authService->handleSocialToken(
+            $provider,
+            $request->validated('access_token')
+        );
+
+        return $this->success([
+            'user'  => new UserResource($result['user']),
+            'token' => $result['token'],
+        ], 'Logged in with ' . ucfirst($provider) . ' successfully.');
     }
 }

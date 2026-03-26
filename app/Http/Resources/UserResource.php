@@ -15,6 +15,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'avatar' => $this->avatar,
             'email_verified' => !is_null($this->email_verified_at),
+            'linked_providers' => $this->whenLoaded('socialAccounts', fn() => $this->socialAccounts->pluck('provider')),
             'created_at' => $this->created_at->toDateTimeString()
         ];
     }

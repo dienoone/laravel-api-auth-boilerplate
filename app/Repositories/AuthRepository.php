@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Contracts\Repositories\AuthRepositoryInterface;
+use App\DTOs\Auth\SocialUserDTO;
+use App\Models\SocialAccount;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -40,5 +42,29 @@ class AuthRepository implements AuthRepositoryInterface
         return $user->update([
             'password' => Hash::make($password),
         ]);
+    }
+
+    public function findSocialAccount(string $provider, string $providerId): ?SocialAccount
+    {
+        return SocialAccount::where('provider', $provider)
+            ->where('provider_id', $providerId)
+            ->with('user')
+            ->first();
+    }
+
+    public function createSocialAccount(User $user, SocialUserDTO $dto): SocialAccount
+    {
+        return SocialAccount::create([
+            'user_id'     => $user->id,
+            'provider'    => $dto->provider,
+            'provider_id' => $dto->providerId,
+            'avatar'      => $dto->avatar,
+        ]);
+    }
+
+    public function updateSocialAccount(SocialAccount $account, string $avatar): SocialAccount
+    {
+        $account->update(['avatar' => $avatar]);
+        return $account->fresh();
     }
 }
